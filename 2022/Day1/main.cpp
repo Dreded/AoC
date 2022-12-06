@@ -2,7 +2,7 @@
 #include <filesystem>
 void part1(std::vector<std::string> lines);
 void part2(std::vector<std::string> lines);
-void findTop3(int currentCount, int largestCalories[3]);
+void findTop3(int &currentCount, int largestCalories[3]);
 
 int main(int argc, char **argv)
 {
@@ -33,7 +33,6 @@ void part1(std::vector<std::string> lines)
         }
         else
         {
-            // std::cout << "Elf" << elfNum+1 << ": " << currentCount << std::endl;
             elfNum++;
             currentCount = 0;
         }
@@ -42,14 +41,11 @@ void part1(std::vector<std::string> lines)
 }
 void part2(std::vector<std::string> lines)
 {
-    int elfNum = 0;
     int currentCount = 0;
     int largestCalories[3] = {0};
 
-    for (int i = 0; i < lines.size(); i++)
+    for (std::string line : lines)
     {
-        std::string line = lines[i];
-        // std::cout << line << std::endl;
         if (line.length() > 0)
         {
             currentCount += std::stoi(line);
@@ -57,8 +53,6 @@ void part2(std::vector<std::string> lines)
         else
         {
             findTop3(currentCount, largestCalories);
-            // std::cout << "Elf" << elfNum+1 << ": " << currentCount << std::endl;
-            elfNum++;
             currentCount = 0;
         }
     }
@@ -67,7 +61,7 @@ void part2(std::vector<std::string> lines)
     std::cout << largestCalories[0] << " : " << largestCalories[1] << " : " << largestCalories[2] << std::endl;
     std::cout << "Total: " << largestCalories[0] + largestCalories[1] + largestCalories[2] << std::endl;
 }
-void findTop3(int currentCount, int largestCalories[3])
+void findTop3(int &currentCount, int largestCalories[3])
 {
     if (currentCount > largestCalories[0])
     {
