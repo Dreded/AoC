@@ -5,5 +5,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <stdio.h>
 
 std::vector<std::string> readFile(std::filesystem::path folder, int file);
