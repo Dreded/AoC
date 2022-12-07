@@ -7,4 +7,4 @@
 #include <vector>
 #include <stdio.h>
 
-std::vector<std::string> readFile(std::filesystem::path folder, int file);
+std::vector<std::string> readFile(int file);

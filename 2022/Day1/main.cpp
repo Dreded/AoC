@@ -6,10 +6,9 @@ void part2_no_sort(std::vector<std::string> lines);
 void part2_sort(std::vector<std::string> lines);
 void findTop3(int &currentCount, int largestCalories[3]);
 
-int main(int argc, char **argv)
+int main()
 {
-    const std::filesystem::path exePath = std::filesystem::path(argv[0]).parent_path();
-    std::vector<std::string> lines = readFile(exePath, 0);
+    std::vector<std::string> lines = readFile(0);
     part1(lines);
     part2_no_sort(lines);
     part2_sort(lines);
