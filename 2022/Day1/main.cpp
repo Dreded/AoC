@@ -1,6 +1,6 @@
 #include "helpers/getInput.hpp"
-#include <filesystem>
 #include <algorithm>
+
 void part1(std::vector<std::string> lines);
 void part2_no_sort(std::vector<std::string> lines);
 void part2_sort(std::vector<std::string> lines);
@@ -41,6 +41,7 @@ void part1(std::vector<std::string> lines)
     }
     std::cout << "Elf" << largestElf + 1 << ": " << largestCalories << std::endl;
 }
+
 void part2_no_sort(std::vector<std::string> lines)
 {
     int currentCount = 0;
@@ -48,15 +49,13 @@ void part2_no_sort(std::vector<std::string> lines)
 
     for (std::string line : lines)
     {
-        if (line.length() > 0)
-        {
-            currentCount += std::stoi(line);
-        }
-        else
+        if (line.length() == 0)
         {
             findTop3(currentCount, largestCalories);
             currentCount = 0;
+            continue;
         }
+        currentCount += std::stoi(line);
     }
     // We need to add in the last output if neccesary(it is on demo but not in problem)
     findTop3(currentCount, largestCalories);

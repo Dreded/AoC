@@ -1,5 +1,4 @@
 #include "helpers/getInput.hpp"
-#include <filesystem>
 
 #define EXAMPLE_FILE 0
 #define PUZZLE_FILE 1
