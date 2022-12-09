@@ -14,6 +14,14 @@ int main(int argc, char **argv)
     return 0;
 }
 
+int getAmmount(char c)
+{
+    int ammount = 64 - 26;
+    if (c > 96)
+        ammount = 96;
+    return c - ammount;
+}
+
 void part1(std::vector<std::string> lines)
 {
     int total = 0;
@@ -25,15 +33,37 @@ void part1(std::vector<std::string> lines)
         {
             if(compartment2.find_first_of(c) < std::string::npos)
             {
-                int ammount = 64-26;
-                if(c > 96) ammount = 96;
-                total += c - ammount;
+                total += getAmmount(c);
                 break;
             }
         }
     }
     std::cout << "Part1: " << total << std::endl;
 }
+
+int checkSacks(std::string sacks[3], int &total)
+{
+    for (char c : sacks[0])
+    {
+        if (sacks[1].find_first_of(c) != std::string::npos && sacks[2].find_first_of(c) != std::string::npos)
+        {
+            total += getAmmount(c);
+            break;
+        }
+    }
+}
+
 void part2(std::vector<std::string> lines)
 {
+    int total = 0;
+    int i = 0;
+    std::string sacks[3];
+    for (std::string line : lines)
+    {
+        sacks[i % 3] = line;
+        i++;
+        if ((i % 3) == 0 && i > 1)
+            checkSacks(sacks, total);
+    }
+    std::cout << "Part2: " << total << std::endl;
 }
