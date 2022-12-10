@@ -8,8 +8,10 @@
 void part1(std::vector<std::string> lines);
 void part2(std::vector<std::string> lines);
 void printTotal(int total);
+void divideDirections(std::string &directions, std::string &santa, std::string &robo);
+void getCoords(std::string &directions, std::set<std::pair<int,int>> &visited_coords);
 
-int main(int argc, char **argv)
+int main()
 {
     std::vector<std::string> lines = readFile(PUZZLE_FILE);
     part1(lines);
@@ -17,42 +19,6 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void printTotal(int total)
-{
-    static int calls = 1;
-    printf("Part%i Total: %i\n", calls,total);
-    calls++;
-}
-
-void getCoords(std::string &directions, std::set<std::pair<int,int>> &visited_coords)
-{
-    std::pair<int,int> coord = {0,0};
-
-    //add out starting position
-    visited_coords.insert(coord);
-
-    //loop through every character of line 1 in lines ( there is only 1 line)
-    for (char &d : directions)
-    {
-        if (d == '^')
-        {
-            coord.second++;
-        }
-        else if (d == '>')
-        {
-            coord.first++;
-        }
-        else if (d == 'v')
-        {
-            coord.second--;
-        }
-        else if (d == '<')
-        {
-            coord.first--;
-        }
-        visited_coords.insert(coord);
-    }
-}
 void part1(std::vector<std::string> lines)
 {
     int total = 0;
@@ -69,16 +35,7 @@ void part1(std::vector<std::string> lines)
     printTotal(total);
 }
 
-// This will take a input where every other character in the drections goes to robo_santa
-// and split it into directions for santa and directions for robo_santa
-void divideDirections(std::string &directions, std::string &santa, std::string &robo)
-{
-    for (int i = 0; i < directions.length(); i++)
-    {
-        if (i % 2 == 0) santa += directions[i];
-        else robo += directions[i];
-    }
-}
+
 
 void part2(std::vector<std::string> lines)
 {
@@ -111,4 +68,52 @@ void part2(std::vector<std::string> lines)
     total = visited_coords.size();
 
     printTotal(total);
+}
+
+// This will take a input where every other character in the drections goes to robo_santa
+// and split it into directions for santa and directions for robo_santa
+void divideDirections(std::string &directions, std::string &santa, std::string &robo)
+{
+    for (int i = 0; i < directions.length(); i++)
+    {
+        if (i % 2 == 0) santa += directions[i];
+        else robo += directions[i];
+    }
+}
+
+void getCoords(std::string &directions, std::set<std::pair<int,int>> &visited_coords)
+{
+    std::pair<int,int> coord = {0,0};
+
+    //add out starting position
+    visited_coords.insert(coord);
+
+    //loop through every character of line 1 in lines ( there is only 1 line)
+    for (char &d : directions)
+    {
+        if (d == '^')
+        {
+            coord.second++;
+        }
+        else if (d == '>')
+        {
+            coord.first++;
+        }
+        else if (d == 'v')
+        {
+            coord.second--;
+        }
+        else if (d == '<')
+        {
+            coord.first--;
+        }
+        visited_coords.insert(coord);
+    }
+}
+
+void printTotal(int total)
+{
+    static int calls = 1;
+    printf("Part%i Total: %i\n", calls,total);
+    calls++;
 }
