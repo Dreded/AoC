@@ -73,8 +73,7 @@ void part2(const std::vector<std::string> &lines)
     printTotal(total);
 }
 
-// This will take a input where every other character in the drections goes to robo_santa
-// and split it into directions for santa and directions for robo_santa
+// Split directions, alternate between santa and robo santa
 void divideDirections(const std::string &directions, std::string &santa, std::string &robo)
 {
     for (int i = 0; i < directions.length(); i++)
