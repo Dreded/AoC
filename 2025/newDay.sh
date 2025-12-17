@@ -89,4 +89,4 @@ curl -s \
 echo "Saved puzzle_input.txt"
 echo "Day $DAY_NUM ready."
 
-nvim "$NEW_DIR/main.cpp"
+nvim -c "cd $NEW_DIR" "$NEW_DIR/main.cpp"
