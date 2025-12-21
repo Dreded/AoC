@@ -14,7 +14,7 @@ constexpr const char* COLOR_RED = "\033[31m";
 constexpr const char* COLOR_YELLOW = "\033[33m";
 constexpr const char* COLOR_RESET = "\033[0m";
 
-inline constexpr std::array<const char*, 2> INPUT_FILES = {
+inline constexpr std::array<const char*, 3> INPUT_FILES = {
     "example_input.txt",
     "puzzle_input.txt",
     "custom_example_input.txt"
