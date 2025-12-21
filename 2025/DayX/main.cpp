@@ -2,20 +2,20 @@
 
 enum FileType { EXAMPLE_FILE, PUZZLE_FILE, CUSTOM_EXAMPLE_FILE };
 
-void printTotal(int total)
+void printTotal(long long total)
 {
     static int calls = 1;
-    printf("Part%i Total: %i\n", calls,total);
+    printf("Part%i Total: %lld\n", calls,total);
     calls++;
 }
 void part1(const InputData& input)
 {
-    int total = 0;
+    long long total = 0;
     printTotal(total);
 }
 void part2(const InputData& input)
 {
-    int total = 0;
+    long long total = 0;
     printTotal(total);
 }
 
