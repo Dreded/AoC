@@ -1,19 +1,6 @@
 #include "../../helpers/getInput.hpp"
 
-enum FileType { EXAMPLE_FILE, PUZZLE_FILE };
-
-void part1(const InputData& input);
-void part2(const InputData& input);
-void printTotal(int total);
-
-int main(int argc, char **argv)
-{
-    InputData input = readFile(EXAMPLE_FILE);
-    header(input);
-    part1(input);
-    part2(input);
-    return 0;
-}
+enum FileType { EXAMPLE_FILE, PUZZLE_FILE, CUSTOM_EXAMPLE_FILE };
 
 void printTotal(int total)
 {
@@ -30,4 +17,23 @@ void part2(const InputData& input)
 {
     int total = 0;
     printTotal(total);
+}
+
+int main(int argc, char **argv)
+{
+    int file = EXAMPLE_FILE; // default
+
+    if (argc > 1) {
+        try {
+            file = std::stoi(argv[1]);
+        } catch (...) {
+            std::cerr << "Invalid file index, using EXAMPLE_FILE\n";
+        }
+    }
+
+    InputData input = readFile(file);
+    header(input);
+    part1(input);
+    part2(input);
+    return 0;
 }

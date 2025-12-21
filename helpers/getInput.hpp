@@ -16,7 +16,8 @@ constexpr const char* COLOR_RESET = "\033[0m";
 
 inline constexpr std::array<const char*, 2> INPUT_FILES = {
     "example_input.txt",
-    "puzzle_input.txt"
+    "puzzle_input.txt",
+    "custom_example_input.txt"
 };
 struct InputData
 {
