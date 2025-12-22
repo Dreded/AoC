@@ -12,4 +12,11 @@ struct Timer
     // Stop the timer and print the duration with a label
     void stopAndPrint(const std::string& label);
 };
+struct ScopedTimer
+{
+  std::string label;
+  Timer t;
 
+  ScopedTimer(const std::string& lbl);
+  ~ScopedTimer();
+};

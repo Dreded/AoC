@@ -12,28 +12,24 @@ void printTotal(long long total)
 
 void part1(const InputData& input)
 {
-    Timer t;
-    t.start();
+    ScopedTimer timer("Part 1");
     long long total = 0;
     for (const auto& line : input.lines)
     {
       printf("%s\n", line.c_str());
     }
     printTotal(total);
-    t.stopAndPrint("Part 1");
 }
 
 void part2(const InputData& input)
 {
-    Timer t;
-    t.start();
+    ScopedTimer timer("Part 2");
     long long total = 0;
     for (const auto& line : input.lines)
     {
       printf("%s\n", line.c_str());
     }
     printTotal(total);
-    t.stopAndPrint("Part 2");
 }
 
 int main(int argc, char **argv)

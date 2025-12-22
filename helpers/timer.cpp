@@ -13,3 +13,12 @@ void Timer::stopAndPrint(const std::string& label)
     std::cout << label << " took " << duration << " µs\n" << std::endl;
 }
 
+ScopedTimer::ScopedTimer(const std::string& lbl) : label(lbl)
+{
+    t.start();
+}
+
+ScopedTimer::~ScopedTimer()
+{
+    t.stopAndPrint(label);
+}
