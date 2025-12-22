@@ -181,22 +181,23 @@ std::vector<Point3D> parsePoints(const std::vector<std::string>& lines)
 
 int main(int argc, char **argv)
 {
-    FileType fileType = EXAMPLE_FILE; // default
+  ScopedTimer timer("Both");
+  FileType fileType = EXAMPLE_FILE; // default
 
-    if(argc > 1) {
-        try {
-            fileType = static_cast<FileType>(std::stoi(argv[1]));
-        } catch(...) {
-            std::cerr << "Invalid file index, using EXAMPLE_FILE\n";
-        }
-    }
+  if(argc > 1) {
+      try {
+          fileType = static_cast<FileType>(std::stoi(argv[1]));
+      } catch(...) {
+          std::cerr << "Invalid file index, using EXAMPLE_FILE\n";
+      }
+  }
 
-    InputData input = readFile(fileType);
-    std::vector<Point3D> points = parsePoints(input.lines);
-    header(input);
+  InputData input = readFile(fileType);
+  std::vector<Point3D> points = parsePoints(input.lines);
+  header(input);
 
-    part1(points, fileType);
-    part2(points);
+  part1(points, fileType);
+  part2(points);
 
-    return 0;
+  return 0;
 }
