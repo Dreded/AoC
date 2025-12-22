@@ -71,12 +71,13 @@ echo "$HTML" |
 
 echo "Saved Problem_Description.md"
 
-# Extract example input (first code block only)
-echo "$HTML" |
-  sed -n '/<pre><code>/,/<\/code><\/pre>/p' |
-  sed 's/<pre><code>//; s/<\/code><\/pre>//' |
-  sed 's/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' \
-    >"$NEW_DIR/example_input.txt"
+# Extract first code block only
+echo "$HTML" | awk '
+  /<pre><code>/ {flag=1; next} 
+  /<\/code><\/pre>/ {flag=0; exit} 
+  flag {print}
+' | sed 's/&lt;/</g; s/&gt;/>/g; s/&amp;/\&/g' \
+  >"$NEW_DIR/example_input.txt"
 
 echo "Extracted example_input.txt"
 
