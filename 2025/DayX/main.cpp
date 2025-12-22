@@ -1,4 +1,5 @@
 #include "../../helpers/getInput.hpp"
+#include "../../helpers/timer.hpp"
 
 enum FileType { EXAMPLE_FILE, PUZZLE_FILE, CUSTOM_EXAMPLE_FILE };
 
