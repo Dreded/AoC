@@ -8,14 +8,24 @@ void printTotal(long long total)
     printf("Part%i Answer: %lld\n", calls,total);
     calls++;
 }
+
 void part1(const InputData& input)
 {
     long long total = 0;
+    for (const auto& line : input.lines)
+    {
+      printf("%s\n", line.c_str());
+    }
     printTotal(total);
 }
+
 void part2(const InputData& input)
 {
     long long total = 0;
+    for (const auto& line : input.lines)
+    {
+      printf("%s\n", line.c_str());
+    }
     printTotal(total);
 }
 
