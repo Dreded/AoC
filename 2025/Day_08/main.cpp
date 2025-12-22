@@ -3,13 +3,16 @@
 #include <limits>
 #include <unordered_map>
 #include <algorithm>
+#include <queue>
+#include <sstream>
+#include <iostream>
 
 enum FileType { EXAMPLE_FILE, PUZZLE_FILE, CUSTOM_EXAMPLE_FILE };
 
 void printTotal(long long total)
 {
     static int calls = 1;
-    printf("Part %i Answer: %lld\n", calls,total);
+    printf("Part %i Answer: %lld\n", calls, total);
     calls++;
 }
 
@@ -17,125 +20,139 @@ struct Point3D { int x, y, z; };
 
 long long distanceSquared(const Point3D &a, const Point3D &b)
 {
-  long long dx = a.x - b.x;
-  long long dy = a.y - b.y;
-  long long dz = a.z - b.z;
-
-  return dx*dx + dy*dy + dz*dz;
+    long long dx = static_cast<long long>(a.x) - b.x;
+    long long dy = static_cast<long long>(a.y) - b.y;
+    long long dz = static_cast<long long>(a.z) - b.z;
+    return dx*dx + dy*dy + dz*dz;
 }
 
 // Disjoint Set Union (DSU / Union-Find)
 struct DSU
 {
-  std::vector<int> parent;
-  std::vector<int> size;
+    std::vector<int> parent;
+    std::vector<int> size;
 
-  DSU (int n)
-  {
-    parent.resize(n);
-    size.resize(n, 1);
-    for (int i = 0; i < n; ++i) parent[i] = i;
-  }
+    DSU(int n)
+    {
+        parent.resize(n);
+        size.resize(n, 1);
+        for (int i = 0; i < n; ++i) parent[i] = i;
+    }
 
-  int find(int x)
-  {
-    if (parent[x] != x) parent[x] = find(parent[x]);
-    return parent[x];
-  }
+    int find(int x)
+    {
+        while (parent[x] != x) {
+            parent[x] = parent[parent[x]]; // path compression
+            x = parent[x];
+        }
+        return x;
+    }
 
-  bool unite(int a, int b)
-  {
-    a = find(a);
-    b = find(b);
-    if(a == b) return false; // already in same circuit
-    if (size[a] < size[b]) std::swap(a, b);
-    parent[b] = a;
-    size[a] += size[b];
-
-    return true;
-  }
+    bool unite(int a, int b)
+    {
+        a = find(a);
+        b = find(b);
+        if(a == b) return false;
+        if(size[a] < size[b]) std::swap(a, b);
+        parent[b] = a;
+        size[a] += size[b];
+        return true;
+    }
 };
 
 struct Edge
 {
-  int u,v;
-  long long dist;
+    int u, v;
+    long long dist;
 };
 
-// generate all possible edges with squared distance
-std::vector<Edge> generateAllEdges(const std::vector<Point3D>& points)
+// generate only the numConnections smallest edges using a max-heap
+std::vector<Edge> generateClosestEdges(const std::vector<Point3D>& points, int numConnections)
 {
-    std::vector<Edge> edges;
     int n = points.size();
-    for (int i = 0; i < n; ++i)
-        for (int j = i + 1; j < n; ++j)
-            edges.push_back({i, j, distanceSquared(points[i], points[j])});
+    auto cmp = [](const Edge& a, const Edge& b){ return a.dist < b.dist; };
+    std::priority_queue<Edge, std::vector<Edge>, decltype(cmp)> maxHeap(cmp);
+
+    for(int i = 0; i < n; ++i) {
+        for(int j = i + 1; j < n; ++j) {
+            long long dist = distanceSquared(points[i], points[j]);
+            Edge e{i, j, dist};
+
+            if((int)maxHeap.size() < numConnections) {
+                maxHeap.push(e);
+            } else if(dist < maxHeap.top().dist) {
+                maxHeap.pop();
+                maxHeap.push(e);
+            }
+        }
+    }
+
+    std::vector<Edge> edges;
+    edges.reserve(maxHeap.size());
+    while(!maxHeap.empty()) {
+        edges.push_back(maxHeap.top());
+        maxHeap.pop();
+    }
+    std::reverse(edges.begin(), edges.end()); // ascending order
     return edges;
 }
 
 long long connectClosestPairs(const std::vector<Point3D>& points, int numConnections = 1000)
 {
-  int n = points.size();
-  auto edges = generateAllEdges(points);
+    int n = points.size();
+    auto edges = generateClosestEdges(points, numConnections);
 
-  // sort edges by distance
-  std::sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b)
-  {
-    return a.dist < b.dist;
-  });
+    DSU dsu(n);
+    for(const auto& e : edges) {
+        dsu.unite(e.u, e.v);
+    }
 
-  DSU dsu(n);
+    // collect all circuit sizes
+    std::unordered_map<int,int> rootCount;
+    for(int i = 0; i < n; ++i) rootCount[dsu.find(i)]++;
 
-  for (int i = 0; i < numConnections && i < (int)edges.size(); ++i) {
-    dsu.unite(edges[i].u, edges[i].v);
-  }
+    std::vector<int> sizes;
+    for(auto &kv : rootCount) sizes.push_back(kv.second); 
+    std::sort(sizes.rbegin(), sizes.rend()); // descending
 
-  //collect all circuit sizes
- std::unordered_map<int,int> rootCount;
- for (int i = 0; i < n; ++i)
- {
-    int root = dsu.find(i);
-    rootCount[root]++;
-  }
+    long long result = 1;
+    for(int i = 0; i < 3 && i < (int)sizes.size(); ++i) result *= sizes[i];
 
-  std::vector<int> sizes;
-  for (auto &kv : rootCount) sizes.push_back(kv.second); 
-  std::sort(sizes.rbegin(), sizes.rend()); // descending
-  long long result = 1;
-  for (int i = 0; i < 3 && i < (int)sizes.size(); ++i) result *= sizes[i];
-
-  return result;
+    return result;
 }
 
-//ok we need to measure 3D points
 void part1(const std::vector<Point3D>& points, const FileType& fileType)
 {
     ScopedTimer timer("Part 1");
-    // if EXAMPLE_FILE then connect 10 if PUZZLE_FILE connect 1000
     int connections = (fileType == EXAMPLE_FILE) ? 10 : 1000;
     long long total = connectClosestPairs(points, connections);
     printTotal(total);
 }
 
-long long lastConnectionProduct(const std::vector<Point3D>& points) {
+long long lastConnectionProduct(const std::vector<Point3D>& points)
+{
     int n = points.size();
-    auto edges = generateAllEdges(points);
-    
-    std::sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b){ return a.dist < b.dist; });
-
     DSU dsu(n);
     int remainingCircuits = n;
-    Edge lastEdge = {0, 1, 0};
+    Edge lastEdge{0,1,0};
 
-    for (const auto& e : edges) {
-        if (dsu.unite(e.u, e.v)) {
-            remainingCircuits--;
+    // Min-heap for edges
+    auto cmp = [](const Edge& a, const Edge& b){ return a.dist > b.dist; };
+    std::priority_queue<Edge, std::vector<Edge>, decltype(cmp)> minHeap(cmp);
+
+    // Only generate edges lazily as needed
+    for(int i = 0; i < n; ++i)
+        for(int j = i + 1; j < n; ++j)
+            minHeap.push({i,j,distanceSquared(points[i], points[j])});
+
+    while(remainingCircuits > 1 && !minHeap.empty()) {
+        Edge e = minHeap.top(); minHeap.pop();
+        if(dsu.unite(e.u, e.v)) {
             lastEdge = e;
-            if (remainingCircuits == 1) break;  // all connected
+            remainingCircuits--;
         }
     }
 
-    // multiply X coordinates of the last two junction boxes
     return static_cast<long long>(points[lastEdge.u].x) * points[lastEdge.v].x;
 }
 
@@ -146,30 +163,30 @@ void part2(const std::vector<Point3D>& points)
     printTotal(total);
 }
 
-const std::vector<Point3D> parsePoints(const std::vector<std::string>& lines)
+std::vector<Point3D> parsePoints(const std::vector<std::string>& lines)
 {
-  std::vector<Point3D> points;
-  for (const auto& line : lines)
-  {
-    std::stringstream ss(line);
-    Point3D p;
-    char c1,c2;
-    if (ss >> p.x >> c1 >> p.y >> c2 >> p.z && c1 == ',' && c2 == ',')
-    {
-      points.push_back(p);
+    std::vector<Point3D> points;
+    for(const auto& line : lines) {
+        std::stringstream ss(line);
+        Point3D p;
+        char c1, c2;
+        if(ss >> p.x >> c1 >> p.y >> c2 >> p.z && c1 == ',' && c2 == ',') {
+            points.push_back(p);
+        } else {
+            std::cerr << "Skipping malformed line: " << line << "\n";
+        }
     }
-  }
-  return points;
+    return points;
 }
 
 int main(int argc, char **argv)
 {
     FileType fileType = EXAMPLE_FILE; // default
 
-    if (argc > 1) {
+    if(argc > 1) {
         try {
             fileType = static_cast<FileType>(std::stoi(argv[1]));
-        } catch (...) {
+        } catch(...) {
             std::cerr << "Invalid file index, using EXAMPLE_FILE\n";
         }
     }
@@ -177,7 +194,9 @@ int main(int argc, char **argv)
     InputData input = readFile(fileType);
     std::vector<Point3D> points = parsePoints(input.lines);
     header(input);
+
     part1(points, fileType);
     part2(points);
+
     return 0;
 }
