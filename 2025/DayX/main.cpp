@@ -5,7 +5,7 @@ enum FileType { EXAMPLE_FILE, PUZZLE_FILE, CUSTOM_EXAMPLE_FILE };
 void printTotal(long long total)
 {
     static int calls = 1;
-    printf("Part%i Total: %lld\n", calls,total);
+    printf("Part%i Answer: %lld\n", calls,total);
     calls++;
 }
 void part1(const InputData& input)
