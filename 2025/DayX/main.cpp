@@ -5,28 +5,34 @@ enum FileType { EXAMPLE_FILE, PUZZLE_FILE, CUSTOM_EXAMPLE_FILE };
 void printTotal(long long total)
 {
     static int calls = 1;
-    printf("Part%i Answer: %lld\n", calls,total);
+    printf("Part %i Answer: %lld\n", calls,total);
     calls++;
 }
 
 void part1(const InputData& input)
 {
+    Timer t;
+    t.start();
     long long total = 0;
     for (const auto& line : input.lines)
     {
       printf("%s\n", line.c_str());
     }
     printTotal(total);
+    t.stopAndPrint("Part 1");
 }
 
 void part2(const InputData& input)
 {
+    Timer t;
+    t.start();
     long long total = 0;
     for (const auto& line : input.lines)
     {
       printf("%s\n", line.c_str());
     }
     printTotal(total);
+    t.stopAndPrint("Part 2");
 }
 
 int main(int argc, char **argv)
