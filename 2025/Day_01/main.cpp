@@ -14,7 +14,7 @@ struct Rotation { int d, a; }; // direction/amount
 
 int moveDial(int current, const Rotation& r)
 {
-  return (current + r.d * r.a) % 100;
+  return (current + r.d * r.a) % 100; //negatives are fine... no need to add a line to fix
 }
 
 int countZeroCrosses(int dial, const Rotation& r)
@@ -62,8 +62,7 @@ std::vector<Rotation> parseInput(const std::vector<std::string>& lines)
  for (const auto& line : lines)
  {
    Rotation r;
-   if (line[0] == 'L') r.d = -1;
-   else r.d = 1;
+   r.d = (line[0] == 'R') ? 1 : -1;
    r.a = std::stoi(line.substr(1));
    rotations.push_back(r);
  }
