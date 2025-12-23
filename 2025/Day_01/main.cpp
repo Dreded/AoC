@@ -1,105 +1,92 @@
 #include "../../helpers/getInput.hpp"
+#include "../../helpers/timer.hpp"
 
 enum FileType { EXAMPLE_FILE, PUZZLE_FILE };
 
 void printTotal(int total)
 {
     static int calls = 1;
-    printf("\nPart%i Total: %i\n", calls,total);
+    printf("Part %i Total: %i\n", calls,total);
     calls++;
 }
 
-int moveDial(int current, char dir, int amount)
+struct Rotation { int d, a; }; // direction/amount
+
+int moveDial(int current, const Rotation& r)
 {
-  if (dir == 'L')
-    current -= amount;
-  else if (dir == 'R')
-    current += amount;
-
-  //contain to 0-99
-  current = (current % 100 + 100) % 100;
-
-  return current;
+  return (current + r.d * r.a) % 100;
 }
 
-int countZeroCrosses(int dial, char dir, int amount)
+int countZeroCrosses(int dial, const Rotation& r)
 {
   int zeroCrosses = 0;
-  // printf("Going %c for %d clicks from %d\n", dir, amount, dial);
 
-  for (int i = 0; i < amount; ++i)
+  //simulate every click
+  for (int i = 0; i < r.a; ++i)
   {
-    if (dir == 'R')
-    {
-      dial = (dial +1) %100;
-    } else if (dir == 'L')
-    {
-      dial = (dial -1+100)%100;
-    }
-    // printf("%d\n", dial);
+    dial = (dial + r.d) % 100;
     if (dial == 0) zeroCrosses++;
   }
-  // printf("Crossed Zero %d times.\n", zeroCrosses);
   return zeroCrosses;
 }
 
 //in part 1 we need to count he times the dial points at zero
-void part1(const InputData& input)
+void part1(const std::vector<Rotation>& rotations)
 {
+  ScopedTimer timer("Part 1");
   // We have a Safe Dial that has numbers 0-99 and starts pointing at 50
   int total = 0;
   int dial = 50;
-  for (const auto& line : input.lines)
-  {
-    // Make sure we dont have a blank line
-    if (line.empty()) continue;
-
-    char dir = line[0];
-    int amount = std::stoi(line.substr(1));
-    dial = moveDial(dial, dir, amount);
-
-    // printf("%d\n", dial);
-    if (dial == 0) total ++;
-  }
+  for (const auto& r : rotations)
+    if ((dial = moveDial(dial, r)) == 0) ++total;
   printTotal(total);
 }
 
 //in part 2 we need to count the times the dial crosses 0 whether its looping or not
-void part2(const InputData& input)
+void part2(const std::vector<Rotation>& rotations)
 {
-    int total = 0;
-    int dial = 50;
-    for (const auto& line : input.lines)
-    {
-      if(line.empty()) continue;
+  ScopedTimer timer("Part 2");
+  int total = 0;
+  int dial = 50;
+  for (const auto& r : rotations)
+  {
+    total += countZeroCrosses(dial, r); // add the times the Dial crosses 0 to the total
+    dial = moveDial(dial, r);           // actually move the dial for the next count
+  }
+  printTotal(total);
+}
 
-      char dir = line[0];
-      int amount = std::stoi(line.substr(1));
-
-      // add the times the Dial crosses 0 to the total
-      total += countZeroCrosses(dial, dir, amount);
-
-      // actually move the dial for the next count
-      dial = moveDial(dial, dir, amount);
-    }
-    printTotal(total);
+std::vector<Rotation> parseInput(const std::vector<std::string>& lines)
+{
+  std::vector<Rotation> rotations;
+ for (const auto& line : lines)
+ {
+   Rotation r;
+   if (line[0] == 'L') r.d = -1;
+   else r.d = 1;
+   r.a = std::stoi(line.substr(1));
+   rotations.push_back(r);
+ }
+ return rotations;
 }
 
 int main(int argc, char **argv)
 {
-    int file = EXAMPLE_FILE; // default
+  ScopedTimer timer("Main");
+  int file = EXAMPLE_FILE; // default
 
-    if (argc > 1) {
-        try {
-            file = std::stoi(argv[1]);
-        } catch (...) {
-            std::cerr << "Invalid file index, using EXAMPLE_FILE\n";
-        }
-    }
+  if (argc > 1) {
+      try {
+          file = std::stoi(argv[1]);
+      } catch (...) {
+          std::cerr << "Invalid file index, using EXAMPLE_FILE\n";
+      }
+  }
 
-    InputData input = readFile(file);
-    header(input);
-    part1(input);
-    part2(input);
-    return 0;
+  InputData input = readFile(file);
+  auto rotations = parseInput(input.lines);
+  header(input);
+  part1(rotations);
+  part2(rotations);
+  return 0;
 }
